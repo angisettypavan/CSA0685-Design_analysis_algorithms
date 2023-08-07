@@ -1,0 +1,68 @@
+#include <stdio.h>
+#include <stdbool.h>
+
+#define MAX_CONTAINERS 100
+#define MAX_ITEMS 100
+
+// Function to sort the items in decreasing order of weight (using bubble sort)
+void sortItems(int items[], int n) {
+    for (int i = 0; i < n - 1; i++) {
+        for (int j = 0; j < n - i - 1; j++) {
+            if (items[j] < items[j + 1]) {
+                // Swap items[j] and items[j+1]
+                int temp = items[j];
+                items[j] = items[j + 1];
+                items[j + 1] = temp;
+            }
+        }
+    }
+}
+
+// Function to compute the container loading using First Fit Decreasing heuristic
+int containerLoading(int items[], int n, int containerCapacity) {
+    int containers[MAX_CONTAINERS] = {0};
+    int containerCount = 0;
+
+    // Sort items in decreasing order of weight
+    sortItems(items, n);
+
+    // Place each item into the first container that can accommodate it
+    for (int i = 0; i < n; i++) {
+        int j;
+        for (j = 0; j < containerCount; j++) {
+            if (containers[j] >= items[i]) {
+                containers[j] -= items[i];
+                break;
+            }
+        }
+        // If no container has enough space, create a new container
+        if (j == containerCount) {
+            containers[containerCount++] = containerCapacity - items[i];
+        }
+    }
+
+    return containerCount;
+}
+
+int main() {
+    int n; // Number of items
+    int containerCapacity; // Capacity of each container
+    int items[MAX_ITEMS];
+
+    printf("Enter the number of items: ");
+    scanf("%d", &n);
+
+    printf("Enter the capacity of each container: ");
+    scanf("%d", &containerCapacity);
+
+    printf("Enter the weights of the items:\n");
+    for (int i = 0; i < n; i++) {
+        scanf("%d", &items[i]);
+    }
+
+    int containerCount = containerLoading(items, n, containerCapacity);
+
+    printf("Number of containers used: %d\n", containerCount);
+
+    return 0;
+}
