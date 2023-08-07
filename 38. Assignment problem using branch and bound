@@ -1,0 +1,84 @@
+#include <stdio.h>
+#include <stdbool.h>
+
+#define MAX_N 10
+#define INF 9999
+
+int n;
+int cost[MAX_N][MAX_N];
+bool assigned[MAX_N];
+
+int minCost = INF;
+int assignedTask[MAX_N];
+
+void initialize() {
+    int i, j;
+    for (i = 0; i < n; i++) {
+        assignedTask[i] = -1;
+        assigned[i] = false;
+        for (j = 0; j < n; j++) {
+            cost[i][j] = INF;
+        }
+    }
+}
+
+void inputCostMatrix() {
+    printf("Enter the cost matrix (separated by spaces):\n");
+    int i, j;
+    for (i = 0; i < n; i++) {
+        for (j = 0; j < n; j++) {
+            scanf("%d", &cost[i][j]);
+        }
+    }
+}
+
+void branchAndBound(int agent, int currentCost) {
+    if (agent == n) {
+        if (currentCost < minCost) {
+            minCost = currentCost;
+            int i;
+            for (i = 0; i < n; i++) {
+                assignedTask[i] = i;
+            }
+        }
+        return;
+    }
+
+    int i;
+    for (i = 0; i < n; i++) {
+        if (!assigned[i]) {
+            assigned[i] = true;
+            assignedTask[agent] = i;
+            branchAndBound(agent + 1, currentCost + cost[agent][i]);
+            assigned[i] = false;
+            assignedTask[agent] = -1;
+        }
+    }
+}
+
+void printAssignment() {
+    printf("\nMinimum Cost: %d\nAssignment:\n", minCost);
+    int i;
+    for (i = 0; i < n; i++) {
+        printf("Agent %d -> Task %d\n", i + 1, assignedTask[i] + 1);
+    }
+}
+
+int main() {
+    printf("Enter the number of agents/tasks (n <= 10): ");
+    scanf("%d", &n);
+
+    if (n <= 0 || n > MAX_N) {
+        printf("Invalid input. n must be between 1 and 10.\n");
+        return 1;
+    }
+
+    initialize();
+    inputCostMatrix();
+    
+    branchAndBound(0, 0);
+
+    printAssignment();
+
+    return 0;
+}
