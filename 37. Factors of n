@@ -1,0 +1,29 @@
+#include <stdio.h>
+
+void printFactors(int n) {
+    printf("Factors of %d: ", n);
+    
+    // Factors are always less than or equal to n/2
+    for (int i = 1; i <= n/2; i++) {
+        if (n % i == 0) {
+            printf("%d ", i);
+        }
+    }
+    
+    // n itself is also a factor
+    printf("%d\n", n);
+}
+
+int main() {
+    int n;
+    printf("Enter a positive integer: ");
+    scanf("%d", &n);
+    
+    if (n <= 0) {
+        printf("Invalid input. Please enter a positive integer.\n");
+        return 1;
+    }
+    
+    printFactors(n);
+    return 0;
+}
