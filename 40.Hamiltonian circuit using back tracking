@@ -1,0 +1,122 @@
+#include <stdio.h>
+#include <stdbool.h>
+
+#define MAX_VERTICES 10
+
+int n; // Number of vertices in the graph
+int graph[MAX_VERTICES][MAX_VERTICES];
+int path[MAX_VERTICES];
+bool visited[MAX_VERTICES];
+
+void initialize() {
+    int i, j;
+    for (i = 0; i < n; i++) {
+        visited[i] = false;
+        path[i] = -1;
+        for (j = 0; j < n; j++) {
+            graph[i][j] = 0;
+        }
+    }
+}
+
+void addEdge(int u, int v) {
+    graph[u][v] = 1;
+    graph[v][u] = 1;
+}
+
+bool isValid(int v, int pos) {
+    if (!visited[v] && graph[path[pos - 1]][v]) {
+        int i;
+        for (i = 0; i < pos; i++) {
+            if (path[i] == v) {
+                return false;
+            }
+        }
+        return true;
+    }
+    return false;
+}
+
+bool hamiltonianCircuitUtil(int pos) {
+    if (pos == n) {
+        // Check if there is an edge from the last vertex to the first vertex
+        if (graph[path[pos - 1]][path[0]]) {
+            return true;
+        }
+        return false;
+    }
+
+    int v;
+    for (v = 1; v < n; v++) {
+        if (isValid(v, pos)) {
+            path[pos] = v;
+            visited[v] = true;
+
+            if (hamiltonianCircuitUtil(pos + 1)) {
+                return true;
+            }
+
+            // If adding vertex v doesn't lead to a solution, backtrack
+            path[pos] = -1;
+            visited[v] = false;
+        }
+    }
+
+    return false;
+}
+
+bool hamiltonianCircuit() {
+    // Start with the first vertex (0) and try to find a Hamiltonian circuit
+    path[0] = 0;
+    visited[0] = true;
+
+    if (hamiltonianCircuitUtil(1)) {
+        return true;
+    }
+
+    return false;
+}
+
+void printHamiltonianCircuit() {
+    printf("Hamiltonian Circuit: ");
+    int i;
+    for (i = 0; i < n; i++) {
+        printf("%d ", path[i]);
+    }
+    printf("%d\n", path[0]); // Print the first vertex again to complete the circuit
+}
+
+int main() {
+    printf("Enter the number of vertices in the graph (n <= 10): ");
+    scanf("%d", &n);
+
+    if (n <= 0 || n > MAX_VERTICES) {
+        printf("Invalid input. n must be between 1 and 10.\n");
+        return 1;
+    }
+
+    initialize();
+
+    int u, v, numEdges;
+    printf("Enter the number of edges in the graph: ");
+    scanf("%d", &numEdges);
+
+    if (numEdges < n - 1 || numEdges > n * (n - 1) / 2) {
+        printf("Invalid number of edges. The graph cannot form a Hamiltonian circuit.\n");
+        return 1;
+    }
+
+    printf("Enter the edges (format: vertex1 vertex2):\n");
+    for (int i = 0; i < numEdges; i++) {
+        scanf("%d %d", &u, &v);
+        addEdge(u, v);
+    }
+
+    if (hamiltonianCircuit()) {
+        printHamiltonianCircuit();
+    } else {
+        printf("No Hamiltonian circuit exists in the graph.\n");
+    }
+
+    return 0;
+}
